@@ -1,5 +1,61 @@
 import { useState } from 'react'
 
+const StatisticLine = (props) => {
+  if (props.text == 'positive'){
+    return(
+      <>
+      <tr>
+        <td>{props.text}</td>
+        <td>{props.value}%</td>
+      </tr>
+      </>
+    )
+  }else {
+    return(
+      <>
+        <tr>
+        <td>{props.text}</td>
+        <td>{props.value}</td>
+      </tr>
+      </>
+    )
+  }
+}
+
+const Statistics = (props) => {
+  if (props.all == 0){
+    return(
+      <>
+        <p>No feedback given</p>
+      </>
+    )
+  }else {
+    return(
+      <>
+        <h1>statistics</h1>
+        <table>
+          <tbody>
+            <StatisticLine text="good" value ={props.good} />
+            <StatisticLine text="neutral" value ={props.neutral} />
+            <StatisticLine text="bad" value ={props.bad} />
+            <StatisticLine text="all" value ={props.all} />
+            <StatisticLine text="average" value ={props.sum/props.average.length} />
+            <StatisticLine text="positive" value ={props.good/props.all*100} />
+          </tbody>
+        </table>
+      </>
+    )
+  }
+}
+
+const Button = (props) =>{
+  return(
+    <>
+      <button onClick={props.handleClick}>{props.text}</button>
+    </>
+  )
+}
+
 const App = () => {
   // tallenna napit omaan tilaansa
   const [good, setGood] = useState(0)
@@ -50,39 +106,31 @@ const App = () => {
 
 
   const painaVote = () => {
-    let max = 0
-    vote.forEach((element, index) => {
+    const uusiVote = vote.map((element, index) => {
       if (index == selected){
-        element++
-      }
-      if (element > max){
-        max = element
+        return element+1
+      }else {
+        return element
       }
     })
-    // setVote(vote[selected]+1)
-    setMaxVote(vote.indexOf(max))
-    console.log(vote)
+    setVote(uusiVote)
+    const uusiMaxVote = uusiVote.indexOf(Math.max(...uusiVote))
+    setMaxVote(uusiMaxVote)
   }
 
   return (
     <div>
       <h1>give feedback</h1>
-      <button onClick={painaGood}>good</button>
-      <button onClick={painaNeutral}>neutral</button>
-      <button onClick={painaBad}>bad</button>
-      <button onClick={painaAnekdootti}>anekdootti</button>
-      <h1>statistics</h1>
-      <p>good {good}</p>
-      <p>neutral {neutral}</p>
-      <p>bad {bad}</p>
-      <p>all {all}</p>
-      <p>average {sum/average.length}</p>
-      <p>positive {good/all*100} %</p>
+      <Button handleClick={painaGood} text='good' />
+      <Button handleClick={painaNeutral} text='neutral' />
+      <Button handleClick={painaBad} text='bad' />
+      <Statistics good={good} neutral={neutral} bad={bad} all={all} average={average} sum={sum}></Statistics>
       <h1>Anecdote of the day</h1>
       <p>{anecdotes[selected]}<br />has {vote[selected]} votes</p>
-      <button onClick={painaVote}>vote</button>
+      <Button handleClick={painaVote} text='vote' />
+      <Button handleClick={painaAnekdootti} text='next anekdootti' />
       <h1>Anecdote with most votes</h1>
-      <p>{vote[maxVote]} has {vote[selected]} votes</p>
+      <p>{anecdotes[maxVote]} has {vote[maxVote]} votes</p>
     </div>
   )
 }
